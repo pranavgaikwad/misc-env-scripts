@@ -11,7 +11,7 @@ from ec2 import get_all_instances, reformat_instance_data, \
     delete_volume, delete_eip, terminate_instance, EC2_KEYS
 from elbs import get_all_elbs, reformat_elbs_data, delete_classic_elb
 from emailer import Emailer
-from s3 import get_all_buckets, reformat_buckets_data
+from s3 import get_all_buckets, reformat_buckets_data, delete_bucket
 from sheet import GoogleSheetEditor
 from vpc import get_all_vpcs, delete_orphan_vpcs
 
@@ -252,6 +252,14 @@ def start(argument):
         numberOfInstancesDeleted = terminate_instances(oldInstancesSheet, allInstancesSheet)
         summaryRow['EC2 Cleanup'] = 'Deleted {} instances'.format(numberOfInstancesDeleted)
         delete_stacks()
+
+    elif argument == 'purge_s3':
+        buckets = oldS3Sheet.read_spreadsheet()
+        for bucket in buckets:
+            name = bucket.get('Name', '')
+            saved = bucket.get('Saved', '')
+            if name != '' and saved not in ["Saved", "Save", "save"]:
+                delete_bucket(bucket=bucket.get('Name'))
 
     elif argument == 'generate_ec2_deletion_summary':
         summaryEmail = get_old_instances_email_summary(oldInstancesSheet, allInstancesSheet, summarySheet)
