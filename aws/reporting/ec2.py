@@ -49,6 +49,17 @@ def reformat_instance_data(raw_instances):
             inst['Cost Per Day'] = "${}".format(calculate_bill_for_instance(instance_type, region, launch_time)[1])
         except:
             inst['Cost Per Day'] = "$0"
+    if not formatted_instances:
+        dummy_old_instance = {}
+        for key in EC2_KEYS:
+            split_keys = key.split('.')
+            if len(split_keys) == 1:
+                dummy_old_instance[key] = ''
+            else:
+                dummy_old_instance[split_keys[-1]] = ''
+        dummy_old_instance['TotalBill'] = ''
+        dummy_old_instance['Cost Per Day'] = ''
+        return [dummy_old_instance]
     return formatted_instances
 
 def get_all_eips():

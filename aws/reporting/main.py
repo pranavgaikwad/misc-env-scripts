@@ -212,7 +212,8 @@ def start(argument):
         instances = reformat_instance_data(instances)
         instances_daily_bill = 0.0
         for instance in instances:
-            instances_daily_bill += float(re.sub(r'\$', '', instance['Cost Per Day']))
+            if instance['Cost Per Day']:
+                instances_daily_bill += float(re.sub(r'\$', '', instance['Cost Per Day']))
         summaryRow['EC2 Daily Cost'] = "${}".format(str(instances_daily_bill))
         print(allInstancesSheet.save_data_to_sheet(instances))
         # update old instance sheet
